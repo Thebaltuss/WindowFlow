@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WindowFlow</title>
+  <link rel="icon" type="image/png" href="{{ url_for('app_icon') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/overrides.css') }}">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand"><img class="brand-logo" src="{{ url_for('app_icon') }}" alt="WindowFlow" style="width:25px;height:25px;object-fit:cover;border-radius:7px;box-shadow:0 5px 16px rgba(103,134,255,.34)"><div><strong>WindowFlow</strong></div></div>
+      <div class="header-buttons" style="display:flex;align-items:center;gap:7px"><button class="icon-button" id="settingsButton" title="Settings" aria-label="Settings" style="width:31px;height:31px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.04);color:#9cafff;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="icon-button tray-button" id="trayButton" title="Send to tray" aria-label="Send to tray" style="width:31px;height:31px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.04);color:#9cafff;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18v12H3z"/><path d="M1 4h22v4H1z"/><path d="M9 14h6"/></svg></button><button class="add-button" id="addWindowButton"><span>＋</span> Add window</button></div>
+    </header>
+
+    <main>
+      <div class="list-head"><div><h1>Saved windows</h1><p>Select an icon to capture the current position.</p></div><span id="windowCount">0</span></div>
+      <section class="window-list" id="windowsList"></section>
+    </main>
+
+    <footer class="app-footer"><button class="sync-button" id="syncLayoutButton"><span>↔</span> Synchronize windows</button><div class="watermark">Made by <a href="https://t.me/owleo" title="t.me/owleo">t.me/owleo</a><span>|</span><a href="https://github.com/Thebaltusss" title="github.com/Thebaltusss">github.com/Thebaltusss</a></div></footer>
+  </div>
+
+  <div class="modal-backdrop" id="windowModal"><div class="modal modal-large"><div class="modal-head"><div><div class="eyebrow">ADD WINDOW</div><h2>Add window</h2></div><button class="close-button" data-close="windowModal">×</button></div><div class="search-box"><span>⌕</span><input id="windowSearch" type="search" placeholder="Search windows..."></div><div class="window-picker"><div class="running-window-list" id="runningWindowList"></div><div class="preview-box" id="previewBox"><div class="preview-empty hidden"></div><img id="windowPreview" alt="Application icon"></div></div><div class="selected-window-detail" id="selectedWindowDetail"></div><div class="modal-actions"><button class="button secondary" data-close="windowModal">Cancel</button><button class="button primary" id="confirmAddWindow" disabled>Add window</button></div></div></div>
+
+  <div class="modal-backdrop" id="confirmModal"><div class="modal confirm-modal"><div class="confirm-icon">!</div><h2 id="confirmTitle">Delete window?</h2><p id="confirmText">This window will be removed from the saved list.</p><div class="modal-actions"><button class="button secondary" id="cancelConfirm">Cancel</button><button class="button danger" id="confirmAction">Delete</button></div></div></div>
+
+  <div class="modal-backdrop" id="settingsModal"><div class="modal settings-modal"><div class="modal-head"><div><div class="eyebrow">SETTINGS</div><h2>WindowFlow settings</h2><p>Control startup and global shortcut behavior.</p></div><button class="close-button" data-close="settingsModal">×</button></div><label class="setting-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;padding:11px;border:1px solid var(--line);border-radius:7px;background:rgba(255,255,255,.035)"><span><b style="display:block;font-size:10px;color:var(--text);margin-bottom:4px">Synchronize on WindowFlow startup</b><small style="display:block;font-size:9px;color:var(--muted)">Apply saved positions when WindowFlow opens.</small></span><input type="checkbox" id="applyStartupSetting" style="width:17px;height:17px;accent-color:var(--blue)"></label><label class="setting-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;padding:11px;border:1px solid var(--line);border-radius:7px;background:rgba(255,255,255,.035)"><span><b style="display:block;font-size:10px;color:var(--text);margin-bottom:4px">Synchronize when saved apps start</b><small style="display:block;font-size:9px;color:var(--muted)">Move an app as soon as it appears after launch.</small></span><input type="checkbox" id="autoApplySetting" style="width:17px;height:17px;accent-color:var(--blue)"></label><label class="hotkey-field">Global shortcut<input id="hotkeyInput" value="Ctrl+Alt+W" placeholder="Click here and press a combination" readonly><small id="hotkeyHint">Click the field and press your key combination. It saves automatically.</small></label></div></div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
